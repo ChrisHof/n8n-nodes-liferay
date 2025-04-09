@@ -1,0 +1,54 @@
+{
+	"name": "n8n-nodes-liferay",
+	"version": "1.0.0",
+	"description": "n8n Node for Liferay",
+	"keywords": [
+		"liferay",
+		"n8n",
+		"n8n-community-node-package"
+	],
+	"license": "Unlicense",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ChrisHof/n8n-nodes-liferay.git"
+	},
+	"engines": {
+		"node": ">=18.10",
+		"pnpm": ">=9.1"
+	},
+	"main": "index.js",
+	"scripts": {
+		"preinstall": "npx only-allow pnpm",
+		"build": "tsc && gulp build:icons",
+		"dev": "tsc --watch",
+		"format": "prettier nodes --write",
+		"lint": "eslint nodes package.json",
+		"lintfix": "eslint nodes package.json --fix"
+	},
+	"files": [
+		"dist"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"nodes": [
+			"dist/nodes/Liferay/Liferay.node.js"
+		]
+	},
+	"devDependencies": {
+		"@typescript-eslint/parser": "^8.29.1",
+		"eslint": "^9.24.0",
+		"eslint-plugin-n8n-nodes-base": "^1.16.3",
+		"gulp": "^5.0.0",
+		"prettier": "^3.5.3",
+		"typescript": "^5.8.3"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "1.82.0"
+	},
+	"dependencies": {
+		"@eslint/eslintrc": "^3.3.1",
+		"@eslint/js": "^9.24.0",
+		"buffer": "^6.0.3",
+		"globals": "^16.0.0"
+	}
+}
