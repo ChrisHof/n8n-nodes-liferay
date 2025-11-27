@@ -1,4 +1,4 @@
-import { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription, NodeConnectionType } from 'n8n-workflow'
+import { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription } from 'n8n-workflow'
 import { headlessApiFields } from './descriptions/HeadlessApiDescription'
 import { objectFields } from './descriptions/ObjectDescription'
 import { executeFunction, getRequestParameters } from './functions/GenericFunctions'
@@ -12,15 +12,15 @@ export class Liferay implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Liferay',
 		name: 'liferay',
-		icon: 'file:liferay.png',
+		icon: 'file:liferay.svg',
 		group: ['transform'],
 		version: 1,
 		description: 'Liferay',
 		defaults: {
 			name: 'Liferay'
 		},
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: ['main'],
+		outputs: ['main'],
 		credentials: [
 			{
 				name: 'oAuth2Api',
@@ -65,8 +65,7 @@ export class Liferay implements INodeType {
 				name: 'baseUrl',
 				type: 'string',
 				required: true,
-				default: 'http://localhost:8080',
-				description: 'i.e. http://localhost:8080'
+				default: 'http://localhost:8080'
 			},
 			{
 				displayName: 'Type',

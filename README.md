@@ -6,7 +6,7 @@
 
 - Authentication via _OAuth2_ or _Basic Auth_
 - Easily interact with _Custom Liferay Objects_ in the GUI
-- All endpoints from _REST applications_ available via Autocomplete
+- All endpoints from _REST Applications_ available via Autocomplete
 
 All operations and parameters of the Headless APIs are made available via the OpenAPI definitions available from Liferays Headless APIs.
 

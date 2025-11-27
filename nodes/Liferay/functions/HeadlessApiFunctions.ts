@@ -8,7 +8,6 @@ export async function getHeadlessApiApplications(this: ILoadOptionsFunctions): P
 	const baseUrl: string = this.getCurrentNodeParameter('baseUrl') as string
 	const response = await apiRequest.call(this, 'GET', baseUrl + '/o/openapi')
 	if (typeof response !== 'object') {
-		console.log(response)
 		throw new Error('Invalid OpenAPI JSON')
 	}
 	let basePaths: INodePropertyOptions[] = []
@@ -28,7 +27,6 @@ export async function getHeadlessApiEndpoints(this: ILoadOptionsFunctions): Prom
 	const headlessApiApplication: string = this.getCurrentNodeParameter('headlessApiApplication') as string
 	const response = await apiRequest.call(this, 'GET', headlessApiApplication)
 	if (typeof response.paths !== 'object') {
-		console.log(response)
 		throw new Error('Invalid OpenAPI JSON')
 	}
 	headlessOpenApiSpec = response

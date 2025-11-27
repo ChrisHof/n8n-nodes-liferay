@@ -13,7 +13,6 @@ export async function getObjectDefinitions(this: ILoadOptionsFunctions): Promise
 	}
 	const response = await apiRequest.call(this, 'GET', baseUrl + '/o/object-admin/v1.0/object-definitions', query)
 	if (typeof response.items !== 'object') {
-		console.log(response)
 		throw new Error('Invalid JSON')
 	}
 	let definitions: INodePropertyOptions[] = []
@@ -35,7 +34,6 @@ export async function getObjectOperations(this: ILoadOptionsFunctions): Promise<
 	const restUrl: string = baseUrl + restContextPath
 	const response = await apiRequest.call(this, 'GET', restUrl + '/openapi.json')
 	if (typeof response.paths !== 'object') {
-		console.log(response)
 		throw new Error('Invalid JSON')
 	}
 	objectOpenApiSpec = response

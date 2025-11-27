@@ -7,6 +7,7 @@ import {
 	ILoadOptionsFunctions,
 	INodeExecutionData,
 	JsonObject,
+	LoggerProxy as Logger,
 	NodeApiError,
 	ResourceMapperField,
 	ResourceMapperFields,
@@ -49,7 +50,6 @@ export async function apiRequest(
 			})
 		}
 	} catch (error) {
-		console.log(error)
 		if (error instanceof NodeApiError) {
 			throw error
 		}
@@ -111,8 +111,13 @@ export async function executeFunction(this: IExecuteFunctions): Promise<INodeExe
 		url = baseUrl + restContextPath + path
 		requestParameters = this.getNodeParameter('objectParameters', 0) as ResourceMapperValue
 		try {
-			body = this.getNodeParameter('objectBody', 0) as object
-		} catch (e) {}
+			body = this.getNodeParameter('objectBody', 0, {}) as object
+		} catch (error) {
+			if (error instanceof NodeApiError) {
+				throw error
+			}
+			throw new NodeApiError(this.getNode(), error as JsonObject)
+		}
 	} else if (type === 'headlessApi') {
 		openApiSpec = headlessOpenApiSpec
 		const headlessApiApplication: string = this.getNodeParameter('headlessApiApplication', 0) as string
@@ -123,9 +128,15 @@ export async function executeFunction(this: IExecuteFunctions): Promise<INodeExe
 		url = headlessApiApplication.replace('/openapi.json', '') + '/' + pathArray.join('/')
 		method = this.getNodeParameter('headlessApiMethod', 0) as string
 		requestParameters = this.getNodeParameter('headlessApiParameters', 0) as ResourceMapperValue
+		Logger.debug(JSON.stringify(requestParameters))
 		try {
-			body = this.getNodeParameter('headlessApiBody', 0) as object
-		} catch (e) {}
+			body = this.getNodeParameter('headlessApiBody', 0, {}) as object
+		} catch (error) {
+			if (error instanceof NodeApiError) {
+				throw error
+			}
+			throw new NodeApiError(this.getNode(), error as JsonObject)
+		}
 	}
 	const openApiMethodParameters = getOpenApiMethodParameters(openApiSpec!, method, path)
 	let query: IDataObject = {}
@@ -139,5 +150,5 @@ export async function executeFunction(this: IExecuteFunctions): Promise<INodeExe
 		}
 	}
 	const response = await apiRequest.call(this, method.toUpperCase() as IHttpRequestMethods, url, query, body)
-	return [[{ json: response }]]
+	return [[{ json: response, pairedItem: { item: 0 } }]]
 }

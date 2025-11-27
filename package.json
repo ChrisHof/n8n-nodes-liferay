@@ -1,9 +1,12 @@
 {
 	"name": "n8n-nodes-liferay",
-	"version": "1.0.2",
+	"version": "1.0.4",
 	"description": "n8n Node for Liferay",
-	"author": "Christian Hofstätter",
 	"license": "MIT",
+	"author": {
+		"name": "Christian Hofstätter",
+		"email": "chrishof@sent.at"
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ChrisHof/n8n-nodes-liferay.git"
@@ -13,13 +16,8 @@
 		"n8n",
 		"n8n-community-node-package"
 	],
-	"engines": {
-		"node": ">=18.10",
-		"pnpm": ">=9.1"
-	},
 	"main": "index.js",
 	"scripts": {
-		"preinstall": "npx only-allow pnpm",
 		"build": "tsc && gulp build:icons",
 		"dev": "tsc --watch",
 		"format": "prettier nodes --write",
@@ -37,13 +35,13 @@
 	},
 	"devDependencies": {
 		"@typescript-eslint/parser": "^8.29.1",
-		"eslint": "^9.24.0",
+		"eslint": "^9.32.0",
 		"eslint-plugin-n8n-nodes-base": "^1.16.3",
 		"gulp": "^5.0.0",
-		"prettier": "^3.5.3",
-		"typescript": "^5.8.3"
+		"prettier": "^3.6.2",
+		"typescript": "^5.9.2"
 	},
 	"peerDependencies": {
-		"n8n-workflow": "1.82.0"
+		"n8n-workflow": "^1.119.0"
 	}
 }
