@@ -2,7 +2,7 @@ import type { INodeProperties } from 'n8n-workflow'
 
 export const objectFields: INodeProperties[] = [
 	{
-		displayName: 'Object Definition Name or ID',
+		displayName: 'Object Definition',
 		name: 'objectDefinition',
 		type: 'options',
 		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
@@ -21,7 +21,7 @@ export const objectFields: INodeProperties[] = [
 		}
 	},
 	{
-		displayName: 'Operation Name or ID',
+		displayName: 'Operation',
 		name: 'objectOperation',
 		type: 'options',
 		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',

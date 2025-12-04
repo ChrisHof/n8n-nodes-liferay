@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-liferay",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"description": "n8n Node for Liferay",
 	"license": "MIT",
 	"author": {

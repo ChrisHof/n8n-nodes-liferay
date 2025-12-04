@@ -17,3 +17,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 ## Video
 
 Watch the [YouTube video](https://www.youtube.com/watch?v=oInsLKQxGIo) for a n8n intro and overview of the _Liferay Node_.
+
+## Screenshots
+
+![n8n Screenshots](/img/screenshots.png?raw=true)

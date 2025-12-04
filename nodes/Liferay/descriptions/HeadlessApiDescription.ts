@@ -2,7 +2,7 @@ import type { INodeProperties } from 'n8n-workflow'
 
 export const headlessApiFields: INodeProperties[] = [
 	{
-		displayName: 'REST Application Name or ID',
+		displayName: 'REST Application Name',
 		name: 'headlessApiApplication',
 		type: 'options',
 		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
@@ -20,7 +20,7 @@ export const headlessApiFields: INodeProperties[] = [
 		}
 	},
 	{
-		displayName: 'Endpoint Name or ID',
+		displayName: 'Endpoint Name',
 		name: 'headlessApiEndpoint',
 		type: 'options',
 		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
@@ -39,7 +39,7 @@ export const headlessApiFields: INodeProperties[] = [
 		}
 	},
 	{
-		displayName: 'Method Name or ID',
+		displayName: 'Method',
 		name: 'headlessApiMethod',
 		type: 'options',
 		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
