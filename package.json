@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-liferay",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "n8n Node for Liferay",
 	"license": "MIT",
 	"author": {
@@ -34,14 +34,15 @@
 		]
 	},
 	"devDependencies": {
-		"@typescript-eslint/parser": "^8.29.1",
-		"eslint": "^9.32.0",
-		"eslint-plugin-n8n-nodes-base": "^1.16.3",
-		"gulp": "^5.0.0",
-		"prettier": "^3.6.2",
-		"typescript": "^5.9.2"
+		"@n8n/node-cli": "*",
+		"@typescript-eslint/parser": "^8.59.3",
+		"eslint": "^10.3.0",
+		"eslint-plugin-n8n-nodes-base": "^1.16.6",
+		"gulp": "^5.0.1",
+		"prettier": "^3.8.3",
+		"typescript": "^5.9.3"
 	},
 	"peerDependencies": {
-		"n8n-workflow": "^1.119.0"
+		"n8n-workflow": "*"
 	}
 }

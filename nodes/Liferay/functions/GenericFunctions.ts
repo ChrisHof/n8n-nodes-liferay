@@ -45,8 +45,10 @@ export async function apiRequest(
 			}
 			return await this.helpers.httpRequestWithAuthentication.call(this, credentialsType, options)
 		} else if (credentialsType === 'oAuth2Api') {
-			return await this.helpers.requestOAuth2.call(this, 'oAuth2Api', options, {
-				tokenType: 'Bearer'
+			return await this.helpers.httpRequestWithAuthentication.call(this, 'oAuth2Api', options, {
+				oauth2: {
+					tokenType: 'Bearer'
+				}
 			})
 		}
 	} catch (error) {
