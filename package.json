@@ -18,26 +18,32 @@
 	],
 	"main": "index.js",
 	"scripts": {
-		"build": "tsc && gulp build:icons",
-		"dev": "tsc --watch",
-		"format": "prettier nodes --write",
-		"lint": "eslint nodes package.json",
-		"lintfix": "eslint nodes package.json --fix"
+		"build": "n8n-node build",
+		"build:watch": "tsc --watch",
+		"dev": "n8n-node dev",
+		"lint": "n8n-node lint",
+		"lint:fix": "n8n-node lint --fix",
+		"release": "n8n-node release",
+		"prepublishOnly": "n8n-node prerelease"
 	},
 	"files": [
 		"dist"
 	],
 	"n8n": {
+		"credentials": [
+			"dist/credentials/LiferayBasicAuthApi.credentials.js",
+			"dist/credentials/LiferayOAuth2Api.credentials.js"
+		],
 		"n8nNodesApiVersion": 1,
 		"nodes": [
 			"dist/nodes/Liferay/Liferay.node.js"
-		]
+		],
+		"strict": true
 	},
 	"devDependencies": {
 		"@n8n/node-cli": "*",
 		"@typescript-eslint/parser": "^8.59.3",
-		"eslint": "^10.3.0",
-		"eslint-plugin-n8n-nodes-base": "^1.16.6",
+		"eslint": "9.39.4",
 		"gulp": "^5.0.1",
 		"prettier": "^3.8.3",
 		"typescript": "^5.9.3"

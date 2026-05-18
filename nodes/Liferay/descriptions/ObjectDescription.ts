@@ -2,7 +2,7 @@ import type { INodeProperties } from 'n8n-workflow'
 
 export const objectFields: INodeProperties[] = [
 	{
-		displayName: 'Object Definition',
+		displayName: 'Object Definition Name or ID',
 		name: 'objectDefinition',
 		type: 'options',
 		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
@@ -11,17 +11,17 @@ export const objectFields: INodeProperties[] = [
 		placeholder: 'The Object Definition to use...',
 		displayOptions: {
 			show: {
-				baseUrl: [{ _cnd: { not: '' } }],
+				authentication: [{ _cnd: { not: '' } }],
 				type: ['objectOperation']
 			}
 		},
 		typeOptions: {
-			loadOptionsDependsOn: ['baseUrl', 'type'],
+			loadOptionsDependsOn: ['authentication', 'type'],
 			loadOptionsMethod: 'getObjectDefinitions'
 		}
 	},
 	{
-		displayName: 'Operation',
+		displayName: 'Operation Name or ID',
 		name: 'objectOperation',
 		type: 'options',
 		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
@@ -30,13 +30,13 @@ export const objectFields: INodeProperties[] = [
 		placeholder: 'The operation to call...',
 		displayOptions: {
 			show: {
-				baseUrl: [{ _cnd: { not: '' } }],
+				authentication: [{ _cnd: { not: '' } }],
 				objectDefinition: [{ _cnd: { not: '' } }],
 				type: ['objectOperation']
 			}
 		},
 		typeOptions: {
-			loadOptionsDependsOn: ['baseUrl', 'type', 'objectDefinition'],
+			loadOptionsDependsOn: ['authentication', 'type', 'objectDefinition'],
 			loadOptionsMethod: 'getObjectOperations'
 		}
 	},
@@ -63,7 +63,7 @@ export const objectFields: INodeProperties[] = [
 		},
 		displayOptions: {
 			show: {
-				baseUrl: [{ _cnd: { not: '' } }],
+				authentication: [{ _cnd: { not: '' } }],
 				objectDefinition: [{ _cnd: { not: '' } }],
 				objectOperation: [{ _cnd: { not: '' } }],
 				type: ['objectOperation']
@@ -77,7 +77,7 @@ export const objectFields: INodeProperties[] = [
 		default: '{}',
 		displayOptions: {
 			show: {
-				baseUrl: [{ _cnd: { not: '' } }],
+				authentication: [{ _cnd: { not: '' } }],
 				objectOperation: [{ _cnd: { regex: '^PATCH|POST|PUT' } }],
 				type: ['objectOperation']
 			}

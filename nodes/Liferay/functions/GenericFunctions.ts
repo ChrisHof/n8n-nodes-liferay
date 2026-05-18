@@ -6,6 +6,7 @@ import {
 	IHttpRequestOptions,
 	ILoadOptionsFunctions,
 	INodeExecutionData,
+	IWebhookFunctions,
 	JsonObject,
 	LoggerProxy as Logger,
 	NodeApiError,
@@ -13,6 +14,7 @@ import {
 	ResourceMapperFields,
 	ResourceMapperValue
 } from 'n8n-workflow'
+import { LiferayApiResponse } from '../types/ObjectTypes'
 import { OpenApiSpec, OpenApiSpecMethodParameter } from '../types/OpenApi'
 import { headlessOpenApiSpec } from './HeadlessApiFunctions'
 import { objectOpenApiSpec } from './ObjectFunctions'
@@ -23,7 +25,7 @@ export async function apiRequest(
 	url: string,
 	query: IDataObject = {},
 	body: object = {}
-): Promise<any> {
+): Promise<LiferayApiResponse | OpenApiSpec | undefined> {
 	const options: IHttpRequestOptions = {
 		method,
 		url: url,
@@ -35,41 +37,32 @@ export async function apiRequest(
 		qs: query,
 		json: true
 	}
-	const credentialsType: string = this.getNodeParameter('authentication', 0) as string
-	const credentials = await this.getCredentials(credentialsType)
 	try {
-		if (credentialsType === 'httpBasicAuth') {
-			options.auth = {
-				password: credentials.password as string,
-				username: credentials.user as string
-			}
-			return await this.helpers.httpRequestWithAuthentication.call(this, credentialsType, options)
-		} else if (credentialsType === 'oAuth2Api') {
-			return await this.helpers.httpRequestWithAuthentication.call(this, 'oAuth2Api', options, {
-				oauth2: {
-					tokenType: 'Bearer'
-				}
-			})
-		}
+		return await this.helpers.httpRequestWithAuthentication.call(this, this.getNodeParameter('authentication', 0) as string, options)
 	} catch (error) {
-		if (error instanceof NodeApiError) {
-			throw error
-		}
 		throw new NodeApiError(this.getNode(), error as JsonObject)
 	}
+	return
+}
+
+export async function getBaseUrl(this: IHookFunctions | IExecuteFunctions | ILoadOptionsFunctions): Promise<string> {
+	const credentialsType: string = this.getNodeParameter('authentication', 0) as string
+	const credentials = await this.getCredentials(credentialsType)
+	return credentialsType === 'liferayOAuth2Api' ? new URL(credentials.accessTokenUrl as string).origin : (credentials.baseUrl as string)
 }
 
 export function getOpenApiMethodParameters(openApiSpec: OpenApiSpec, method: string, path: string): OpenApiSpecMethodParameter[] {
 	method = method.toLowerCase()
 	if (
-		typeof openApiSpec.paths !== 'object' ||
-		typeof openApiSpec.paths[path] !== 'object' ||
-		typeof openApiSpec.paths[path][method] !== 'object' ||
-		typeof openApiSpec.paths[path][method].parameters !== 'object'
+		typeof openApiSpec === 'object' &&
+		typeof openApiSpec.paths === 'object' &&
+		typeof openApiSpec.paths[path] === 'object' &&
+		typeof openApiSpec.paths[path][method] === 'object' &&
+		typeof openApiSpec.paths[path][method].parameters === 'object'
 	) {
-		throw new Error('Error getting parameters from OpenAPI JSON for method ' + method + ' on path ' + path + '.')
+		return openApiSpec.paths[path][method].parameters
 	}
-	return openApiSpec.paths[path][method].parameters
+	return []
 }
 
 export async function getRequestParameters(this: ILoadOptionsFunctions): Promise<ResourceMapperFields> {
@@ -85,7 +78,7 @@ export async function getRequestParameters(this: ILoadOptionsFunctions): Promise
 		path = this.getCurrentNodeParameter('headlessApiEndpoint') as string
 	}
 	const openApiMethodParameters = getOpenApiMethodParameters(openApiSpec, method, path)
-	let fields: ResourceMapperField[] = []
+	const fields: ResourceMapperField[] = []
 	openApiMethodParameters.forEach((parameter: OpenApiSpecMethodParameter) => {
 		fields.push({
 			id: parameter.name,
@@ -100,7 +93,7 @@ export async function getRequestParameters(this: ILoadOptionsFunctions): Promise
 
 export async function executeFunction(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 	const type: string = this.getNodeParameter('type', 0) as string
-	const baseUrl: string = this.getNodeParameter('baseUrl', 0) as string
+	const baseUrl: string = await getBaseUrl.call(this)
 	let openApiSpec: OpenApiSpec
 	let [method, path, url]: string = ''
 	let requestParameters: ResourceMapperValue
@@ -115,16 +108,13 @@ export async function executeFunction(this: IExecuteFunctions): Promise<INodeExe
 		try {
 			body = this.getNodeParameter('objectBody', 0, {}) as object
 		} catch (error) {
-			if (error instanceof NodeApiError) {
-				throw error
-			}
 			throw new NodeApiError(this.getNode(), error as JsonObject)
 		}
 	} else if (type === 'headlessApi') {
 		openApiSpec = headlessOpenApiSpec
 		const headlessApiApplication: string = this.getNodeParameter('headlessApiApplication', 0) as string
 		path = this.getNodeParameter('headlessApiEndpoint', 0) as string
-		let pathArray: string[] = path.split('/')
+		const pathArray: string[] = path.split('/')
 		pathArray.shift()
 		pathArray.shift()
 		url = headlessApiApplication.replace('/openapi.json', '') + '/' + pathArray.join('/')
@@ -134,14 +124,11 @@ export async function executeFunction(this: IExecuteFunctions): Promise<INodeExe
 		try {
 			body = this.getNodeParameter('headlessApiBody', 0, {}) as object
 		} catch (error) {
-			if (error instanceof NodeApiError) {
-				throw error
-			}
 			throw new NodeApiError(this.getNode(), error as JsonObject)
 		}
 	}
 	const openApiMethodParameters = getOpenApiMethodParameters(openApiSpec!, method, path)
-	let query: IDataObject = {}
+	const query: IDataObject = {}
 	for (const key in requestParameters!.value) {
 		const openApiMethodParameter = openApiMethodParameters.find((p: OpenApiSpecMethodParameter) => p.name === key)
 		if (!openApiMethodParameter) continue
@@ -151,6 +138,30 @@ export async function executeFunction(this: IExecuteFunctions): Promise<INodeExe
 			query[key] = requestParameters!.value[key]
 		}
 	}
-	const response = await apiRequest.call(this, method.toUpperCase() as IHttpRequestMethods, url, query, body)
+	const response = (await apiRequest.call(this, method.toUpperCase() as IHttpRequestMethods, url, query, body)) as IDataObject
 	return [[{ json: response, pairedItem: { item: 0 } }]]
+}
+
+export async function getOAuthAccessToken(
+	this: IHookFunctions | IExecuteFunctions | ILoadOptionsFunctions | IWebhookFunctions
+): Promise<{ access_token: string }> {
+	const credentials = await this.getCredentials('liferayOAuth2Api')
+	const options: IHttpRequestOptions = {
+		headers: {
+			'content-type': 'application/x-www-form-urlencoded'
+		},
+		method: 'POST',
+		qs: {
+			client_id: credentials.clientId,
+			client_secret: credentials.clientSecret,
+			grant_type: 'client_credentials'
+		},
+		url: credentials.accessTokenUrl as string,
+		json: true
+	}
+	try {
+		return await this.helpers.httpRequest.call(this, options)
+	} catch (error) {
+		throw new NodeApiError(this.getNode(), error as JsonObject)
+	}
 }

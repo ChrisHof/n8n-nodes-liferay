@@ -1,4 +1,4 @@
-import { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription } from 'n8n-workflow'
+import { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription, NodeApiError, NodeConnectionTypes } from 'n8n-workflow'
 import { headlessApiFields } from './descriptions/HeadlessApiDescription'
 import { objectFields } from './descriptions/ObjectDescription'
 import { executeFunction, getRequestParameters } from './functions/GenericFunctions'
@@ -16,27 +16,29 @@ export class Liferay implements INodeType {
 		group: ['transform'],
 		version: 1,
 		description: 'Liferay',
+		subtitle: '',
 		defaults: {
 			name: 'Liferay'
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		usableAsTool: true,
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
-				name: 'oAuth2Api',
+				name: 'liferayOAuth2Api',
 				required: true,
 				displayOptions: {
 					show: {
-						authentication: ['oAuth2Api']
+						authentication: ['liferayOAuth2Api']
 					}
 				}
 			},
 			{
-				name: 'httpBasicAuth',
+				name: 'liferayBasicAuthApi',
 				required: true,
 				displayOptions: {
 					show: {
-						authentication: ['httpBasicAuth']
+						authentication: ['liferayBasicAuthApi']
 					}
 				}
 			}
@@ -49,23 +51,15 @@ export class Liferay implements INodeType {
 				options: [
 					{
 						name: 'Basic Auth',
-						value: 'httpBasicAuth'
+						value: 'liferayBasicAuthApi'
 					},
 					{
 						name: 'OAuth2',
-						value: 'oAuth2Api'
+						value: 'liferayOAuth2Api'
 					}
 				],
-				required: true,
-				default: 'httpBasicAuth',
-				description: 'The way to authenticate with Liferay'
-			},
-			{
-				displayName: 'Liferay Base URL',
-				name: 'baseUrl',
-				type: 'string',
-				required: true,
-				default: 'http://localhost:8080'
+				default: 'liferayOAuth2Api',
+				description: 'Way to authenticate with Liferay'
 			},
 			{
 				displayName: 'Type',
@@ -82,8 +76,13 @@ export class Liferay implements INodeType {
 					}
 				],
 				required: true,
-				default: '',
-				noDataExpression: true
+				default: 'headlessApi',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						authentication: [{ _cnd: { not: '' } }]
+					}
+				}
 			},
 			...objectFields,
 			...headlessApiFields
@@ -102,6 +101,14 @@ export class Liferay implements INodeType {
 		}
 	}
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-		return executeFunction.call(this)
+		try {
+			return executeFunction.call(this)
+		} catch (error) {
+			if (this.continueOnFail()) {
+				return []
+			} else {
+				throw new NodeApiError(this.getNode(), error)
+			}
+		}
 	}
 }

@@ -1,16 +1,16 @@
 import { ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow'
 import { OpenApiBase, OpenApiSpec } from '../types/OpenApi'
-import { apiRequest } from './GenericFunctions'
+import { apiRequest, getBaseUrl } from './GenericFunctions'
 
 export let headlessOpenApiSpec: OpenApiSpec
 
 export async function getHeadlessApiApplications(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-	const baseUrl: string = this.getCurrentNodeParameter('baseUrl') as string
-	const response = await apiRequest.call(this, 'GET', baseUrl + '/o/openapi')
+	const baseUrl: string = await getBaseUrl.call(this)
+	const response = (await apiRequest.call(this, 'GET', baseUrl + '/o/openapi')) as unknown as OpenApiBase
 	if (typeof response !== 'object') {
 		throw new Error('Invalid OpenAPI JSON')
 	}
-	let basePaths: INodePropertyOptions[] = []
+	const basePaths: INodePropertyOptions[] = []
 	const openApiBase: OpenApiBase = response
 	for (const key in openApiBase) {
 		const url: string = openApiBase[key][0].replace('openapi.yaml', 'openapi.json')
@@ -25,13 +25,13 @@ export async function getHeadlessApiApplications(this: ILoadOptionsFunctions): P
 
 export async function getHeadlessApiEndpoints(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 	const headlessApiApplication: string = this.getCurrentNodeParameter('headlessApiApplication') as string
-	const response = await apiRequest.call(this, 'GET', headlessApiApplication)
+	const response = (await apiRequest.call(this, 'GET', headlessApiApplication)) as OpenApiSpec
 	if (typeof response.paths !== 'object') {
 		throw new Error('Invalid OpenAPI JSON')
 	}
 	headlessOpenApiSpec = response
-	let endpoints: INodePropertyOptions[] = []
-	for (let path in headlessOpenApiSpec.paths) {
+	const endpoints: INodePropertyOptions[] = []
+	for (const path in headlessOpenApiSpec.paths) {
 		if (path.startsWith('/openapi')) continue
 		endpoints.push({
 			name: path,
@@ -43,7 +43,7 @@ export async function getHeadlessApiEndpoints(this: ILoadOptionsFunctions): Prom
 }
 
 export async function getHeadlessApiMethods(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-	let methods: INodePropertyOptions[] = []
+	const methods: INodePropertyOptions[] = []
 	if (typeof headlessOpenApiSpec === 'object' && typeof headlessOpenApiSpec.paths === 'object') {
 		Object.keys(headlessOpenApiSpec.paths[this.getCurrentNodeParameter('headlessApiEndpoint') as string]).forEach((key) => {
 			methods.push({
