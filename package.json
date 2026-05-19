@@ -1,12 +1,13 @@
 {
 	"name": "n8n-nodes-liferay",
-	"version": "1.0.6",
+	"version": "1.0.7",
 	"description": "n8n Node for Liferay",
 	"license": "MIT",
 	"author": {
 		"name": "Christian Hofstätter",
 		"email": "chrishof@sent.at"
 	},
+	"homepage": "https://github.com/ChrisHof/n8n-nodes-liferay",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ChrisHof/n8n-nodes-liferay.git"
